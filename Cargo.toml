@@ -1,0 +1,8 @@
+[workspace]
+members = [
+    "crates/honeypot-node",
+    "crates/traffic-collector",
+    "crates/behavior-engine",
+    "crates/adaptive-controller",
+    "crates/shared"
+]

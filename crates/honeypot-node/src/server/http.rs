@@ -4,7 +4,8 @@ use std::convert::Infallible;
 use std::net::SocketAddr;
 
 async fn handle(req: Request<Body> , client_ip:SocketAddr) -> Result<Response<Body>,Infallible>{
-    println!("IP: {} , Method: {} , Uri: {} ",client_ip,req.method(),req.uri());
+    tracing::info!("Log file");
+    tracing::info!(ip=%client_ip , method=%req.method() , uri=%req.uri() , "Incoming request");
     if req.uri().path()=="/login"{
         return Ok(Response::new(Body::from("<h1>Login Page</h1><form method='POST'></form>")));
     }

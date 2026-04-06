@@ -44,6 +44,7 @@ async fn handle_client(stream:TcpStream,addr:std::net::SocketAddr){
         ipadd:addr.to_string(),
     };
     let mut line=String::new();
+    let _=writter.write_all(b"Welcome ftp server");
     loop{
         line.clear();
         if reader.read_line(&mut line).await.unwrap() == 0 {
@@ -76,8 +77,9 @@ async fn handle_client(stream:TcpStream,addr:std::net::SocketAddr){
         }
     }
 }
-pub async fn ftp(){
-    let listener=TcpListener::bind("0.0.0.0:21").await.unwrap();
+pub async fn start_ftp(){
+    let listener=TcpListener::bind("0.0.0.0:2121").await.unwrap();
+    println!("Executing ftp");
     loop {
         let (stream,addr) = listener.accept().await.unwrap();
         tokio::spawn(handle_client(stream,addr));

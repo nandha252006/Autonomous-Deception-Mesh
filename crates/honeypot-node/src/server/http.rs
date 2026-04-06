@@ -2,7 +2,8 @@ use hyper::{Body,Request,Response,Server};
 use hyper::service::{make_service_fn,service_fn};
 use std::convert::Infallible;
 use std::net::SocketAddr;
-
+// hyper is used to design high level http server whereas TcpListener used to low level http server and etc..
+// Infallible --> never actually fails 
 async fn handle(req: Request<Body> , client_ip:SocketAddr) -> Result<Response<Body>,Infallible>{
     tracing::info!("Log file");
     tracing::info!(ip=%client_ip , method=%req.method() , uri=%req.uri() , "Incoming request");

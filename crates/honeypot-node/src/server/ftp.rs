@@ -1,4 +1,4 @@
-use tokio::net::{TcpListener,TcpStream};
+use tokio::net::{TcpLISTener,TcpStream};
 use tokio::io::{AsyncBufReadExt,BufReader,AsyncWriteExt};
 struct Session{
     username: Option<String>,
@@ -7,31 +7,41 @@ struct Session{
     passive_listener:Option<String>,
     ipadd: String,
 }
+struct Logevent{
+    protocol:String,
+    time: String,
+    ip: String,
+    command: String,
+    data: String,
+}
 enum Command{
-    User(String),
-    Pass(String),
-    List,
-    Retr(String),
+    USER(String),
+    PASS(String),
+    LIST,
+    RETR(String),
     Stor(String),
-    Pasv,
-    Quit,
+    PASS,
+    QUIT,
     Unknown,
 }
 fn parse_command(line:&str)->Command {
     let part:Vec<&str> = line.split_whitespace().collect();
     match part.get(0){
-        Some(&"User")=>Command::User(part.get(1).unwrap_or(&"").to_string()),
-        Some(&"Pass")=>Command::Pass(part.get(1).unwrap_or(&"").to_string()),
-        Some(&"List")=>Command::List,
-        Some(&"Retr")=>Command::Retr(part.get(1).unwrap_or(&"").to_string()),
-        Some(&"Stor")=>Command::Stor(part.get(1).unwrap_or(&"").to_string()),
-        Some(&"Pasv")=>Command::Pasv,
-        Some(&"Quit")=>Command::Quit,
+        Some(&"USER")=>Command::User(part.get(1).unwrap_or(&"").to_string()),
+        Some(&"PASS")=>Command::Pass(part.get(1).unwrap_or(&"").to_string()),
+        Some(&"LIST")=>Command::List,
+        Some(&"RETR")=>Command::Retr(part.get(1).unwrap_or(&"").to_string()),
+        Some(&"STOR")=>Command::Stor(part.get(1).unwrap_or(&"").to_string()),
+        Some(&"PASS")=>Command::Pasv,
+        Some(&"QUIT")=>Command::Quit,
         _ => Command::Unknown,
     }
 }
 async fn list_file()-> String{
     "drwxr-xr-x 1 root root 4096 etc\r\n-rw-r--r-- 1 root root 123 passwd\r\n".to_string()
+}
+async fn logevent(log:Logevent){
+    println!("{} {} {} {} {}",log.protocol,log.time,log.ip,log.command,log.data);
 }
 async fn handle_client(stream:TcpStream,addr:std::net::SocketAddr){
     let (reader, mut writter)=stream.into_split();
@@ -52,21 +62,49 @@ async fn handle_client(stream:TcpStream,addr:std::net::SocketAddr){
         }
         let cmd=parse_command(line.trim());
         match cmd{
-            Command::User(u)=> {
+            Command::USER(u)=> {
                 session.username=Some(u.clone());
                 let msg=format!("Registered the username as {}",u);
                 writter.write_all(msg.as_bytes()).await.unwrap();
+                logevent(Logevent{
+                    protocol:"FTP".to_string(),
+                    time:chrono::offset::Local::now().to_string(),
+                    ip:addr.to_string();
+                    command:"USER".to_string(),
+                    data:u.clone(),
+                });
             },
-            Command::Pass(p)=>{
+            Command::PASS(p)=>{
                 session.authenticated=true;
                 writter.write_all(b"authenticated inside the ftp server\r\n").await.unwrap();
+                logevent(Logevent{
+                    protocol:"FTP".to_string(),
+                    time:chrono::offset::Local::now().to_string(),
+                    ip:addr.to_string();
+                    command:"PASS".to_string(),
+                    data:p.clone(),
+                });
             },
-            Command::List=>{
+            Command::LIST=>{
                 let file_system=list_file().await;
                 writter.write_all(list_file().await.as_bytes()).await.unwrap();
+                logevent(Logevent{
+                    protocol:"FTP".to_string(),
+                    time:chrono::offset::Local::now().to_string(),
+                    ip:addr.to_string();
+                    command:"LIST".to_string(),
+                    data:"Success".into(),
+                });
             }
-            Command::Quit=>{
+            Command::QUIT=>{
                 writter.write_all(b"Exited the ftp server\r\n").await.unwrap();
+                logevent(Logevent{
+                    protocol:"FTP".to_string(),
+                    time:chrono::offset::Local::now().to_string(),
+                    ip:addr.to_string();
+                    command:"QUIT".to_string(),
+                    data:"Success".into(),
+                });
                 break;
             }
             _=>{
@@ -78,7 +116,7 @@ async fn handle_client(stream:TcpStream,addr:std::net::SocketAddr){
     }
 }
 pub async fn start_ftp(){
-    let listener=TcpListener::bind("0.0.0.0:2121").await.unwrap();
+    let listener=TcpLISTener::bind("0.0.0.0:2121").await.unwrap();
     println!("Executing ftp");
     loop {
         let (stream,addr) = listener.accept().await.unwrap();

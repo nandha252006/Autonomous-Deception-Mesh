@@ -1,0 +1,31 @@
+smb: \public\> ls
+  .                                  DR        0  Thu Apr 24 10:32:16 2025
+  ..                                 DR        0  Mon Mar  3 16:39:25 2025
+  AccountPictures                   DHR        0  Mon Mar  3 16:23:15 2025
+  Cisco Packet Tracer 8.2.2           D        0  Mon Apr 21 16:32:18 2025
+  desktop.ini                       AHS      174  Mon Apr  1 12:54:04 2024
+  Documents                          DR        0  Tue Mar  4 00:10:38 2025
+  Downloads                          DR        0  Mon Apr  1 12:56:11 2024
+  Libraries                         DHR        0  Mon Apr  1 13:04:25 2024
+  Music                              DR        0  Mon Apr  1 12:56:11 2024
+  Pictures                           DR        0  Mon Apr  1 12:56:11 2024
+  Videos                             DR        0  Mon Apr  1 12:56:11 2024
+
+		65348863 blocks of size 4096. 23798283 blocks available
+smb: \public\> cd Do
+Documents\  Downloads\  
+smb: \public\> cd Downloads\
+smb: \public\Downloads\> ls
+  .                                  DR        0  Mon Apr  1 12:56:11 2024
+  ..                                 DR        0  Thu Apr 24 10:32:16 2025
+  desktop.ini                       AHS      174  Mon Apr  1 12:54:04 2024
+
+		65348863 blocks of size 4096. 23798275 blocks available
+smb: \public\Downloads\> cd ../Pictures\
+smb: \public\Pictures\> ls
+  .                                  DR        0  Mon Apr  1 12:56:11 2024
+  ..                                 DR        0  Thu Apr 24 10:32:16 2025
+  desktop.ini                       AHS      380  Mon Apr  1 12:54:04 2024
+
+		65348863 blocks of size 4096. 23798259 blocks available
+smb: \public\Pictures\> 
